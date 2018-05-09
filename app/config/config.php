@@ -43,7 +43,7 @@ return array(
 	 */
 	// 'index_file' => false,
 
-	// 'profiling'  => false,
+	'profiling'  => true,
 
 	/**
 	 * Default location for the file cache
@@ -210,11 +210,6 @@ return array(
 		 */
 		// 'global_input_fallback' => true,
 	// ),
-
-	/**
-	 * Controller class prefix
-	 */
-	 // 'controller_prefix' => 'Controller_',
 
 	/**
 	 * Routing settings

@@ -3,7 +3,7 @@
  * Fuel is a fast, lightweight, community driven PHP 5.4+ framework.
  *
  * @package    Fuel
- * @version    1.9-dev
+ * @version    develop
  * @author     Fuel Development Team
  * @license    MIT License
  * @copyright  2010 - 2018 Fuel Development Team
@@ -16,39 +16,46 @@
 error_reporting(-1);
 ini_set('display_errors', 1);
 
+// Get the start time and memory for use later
+defined('FUEL_START_TIME') or define('FUEL_START_TIME', microtime(true));
+defined('FUEL_START_MEM') or define('FUEL_START_MEM', memory_get_usage());
+
 /**
  * Website document root
  */
 define('DOCROOT', __DIR__.DIRECTORY_SEPARATOR);
 
 /**
+ * Composer location
+ */
+define('VENDORPATH', realpath(__DIR__.'/../vendor').DIRECTORY_SEPARATOR);
+
+/**
  * Path to the application directory.
  */
-define('APPPATH', realpath(__DIR__.'/../fuel/app/').DIRECTORY_SEPARATOR);
+define('APPPATH', realpath(__DIR__.'/../app/').DIRECTORY_SEPARATOR);
 
 /**
  * Path to the default packages directory.
  */
 define('PKGPATH', realpath(__DIR__.'/../fuel/packages/').DIRECTORY_SEPARATOR);
 
-/**
- * The path to the framework core.
- */
-define('COREPATH', realpath(__DIR__.'/../fuel/core/').DIRECTORY_SEPARATOR);
-
-// Get the start time and memory for use later
-defined('FUEL_START_TIME') or define('FUEL_START_TIME', microtime(true));
-defined('FUEL_START_MEM') or define('FUEL_START_MEM', memory_get_usage());
-
-// Load in the Fuel autoloader
-if ( ! file_exists(COREPATH.'classes'.DIRECTORY_SEPARATOR.'autoloader.php'))
+// Load composer
+if ( ! is_file(VENDORPATH.'autoload.php'))
 {
-	die('No composer autoloader found. Please run composer to install the FuelPHP framework dependencies first!');
+	die('Composer is not installed in "'.VENDORPATH.'". Please verify your Composer installation.');
 }
+$composer = require(VENDORPATH.'autoload.php');
 
-// Activate the framework class autoloader
-require COREPATH.'classes'.DIRECTORY_SEPARATOR.'autoloader.php';
+// Load the Fuel autoloader for backward compatibility
+if ( ! class_exists("Fuel\\Core\\Autoloader"))
+{
+	die('Unable to load the Fuel Autoloader. Check your composer.json and make sure all required components are installed.');
+}
 class_alias('Fuel\\Core\\Autoloader', 'Autoloader');
+
+// Register the autoloaders
+\Autoloader::register($composer);
 
 // Exception route processing closure
 $routerequest = function($request = null, $e = false)
