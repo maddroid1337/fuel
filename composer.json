@@ -7,7 +7,7 @@
 	"require": {
 		"php": ">=5.5",
 		"composer/installers": "~1.0",
-		"fuelphp/v1core" : "dev-master as 1.9.0",
+		"fuelphp/v1core": "dev-master as 1.9.0",
 		"fuelphp/v1auth": "dev-master as 1.9.0",
 		"fuelphp/v1email": "dev-master as 1.9.0",
 		"fuelphp/v1oil": "dev-master as 1.9.0",

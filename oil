@@ -18,11 +18,9 @@ if (substr(php_sapi_name(), 0, 3) == 'cgi')
     die("The use of oil is not supported when running php-cgi. Oil needs php-cli to function!\n\n");
 }
 
-/**
- * Set error reporting and display errors settings.  You will want to change these when in production.
- */
-error_reporting(-1);
-ini_set('display_errors', 1);
+// Get the start time and memory for use later
+defined('FUEL_START_TIME') or define('FUEL_START_TIME', microtime(true));
+defined('FUEL_START_MEM') or define('FUEL_START_MEM', memory_get_usage());
 
 /**
  * Website document root
@@ -30,36 +28,36 @@ ini_set('display_errors', 1);
 define('DOCROOT', __DIR__.DIRECTORY_SEPARATOR);
 
 /**
+ * Composer location
+ */
+define('VENDORPATH', realpath(__DIR__.'/vendor').DIRECTORY_SEPARATOR);
+
+/**
  * Path to the application directory.
  */
-define('APPPATH', realpath(__DIR__.'/fuel/app/').DIRECTORY_SEPARATOR);
+define('APPPATH', realpath(__DIR__.'/app/').DIRECTORY_SEPARATOR);
 
 /**
  * Path to the default packages directory.
  */
-define('PKGPATH', realpath(__DIR__.'/fuel/packages/').DIRECTORY_SEPARATOR);
+define('PKGPATH', realpath(__DIR__.'/../fuel/packages/').DIRECTORY_SEPARATOR);
 
-/**
- * The path to the framework core.
- */
-define('COREPATH', realpath(__DIR__.'/fuel/core/').DIRECTORY_SEPARATOR);
-
-// Get the start time and memory for use later
-defined('FUEL_START_TIME') or define('FUEL_START_TIME', microtime(true));
-defined('FUEL_START_MEM') or define('FUEL_START_MEM', memory_get_usage());
-
-// Load in the Fuel autoloader
-if ( ! file_exists(COREPATH.'classes'.DIRECTORY_SEPARATOR.'autoloader.php'))
+// Load composer
+if ( ! is_file(VENDORPATH.'autoload.php'))
 {
-    die("No composer autoloader found. Please run composer to install the FuelPHP framework dependencies first!\n\n");
+	die('Composer is not installed in "'.VENDORPATH.'". Please verify your Composer installation.');
 }
+$composer = require(VENDORPATH.'autoload.php');
 
-// Load in the Fuel autoloader
-require COREPATH.'classes'.DIRECTORY_SEPARATOR.'autoloader.php';
+// Load the Fuel autoloader for backward compatibility
+if ( ! class_exists("Fuel\\Core\\Autoloader"))
+{
+	die('Unable to load the Fuel Autoloader. Check your composer.json and make sure all required components are installed.');
+}
 class_alias('Fuel\\Core\\Autoloader', 'Autoloader');
 
-// Boot the app
-require APPPATH.'bootstrap.php';
+// Register the autoloaders
+\Autoloader::register($composer);
 
 // Load oil package
 \Package::load('oil');
